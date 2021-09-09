@@ -1,0 +1,35 @@
+version: "3"
+
+networks:
+  myapp-net:
+
+services:
+  database:
+    image: 'mysql:8.0.21'
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_DATABASE: marketingPreferences
+      MYSQL_USER: root
+      MYSQL_PASSWORD: password
+    ports:
+      - '3307:3306'
+    volumes:
+      - ~/data/mysql8:/var/lib/mysql
+    networks:
+      - myapp-net
+
+  marketing-preferences:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+    - 8080:8080
+    environment:
+      SPRING_DATASOURCE_URL: 'jdbc:mysql://database:3307/marketingPreferences'
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: password
+    networks:
+      - myapp-net
+    depends_on:
+      - database
